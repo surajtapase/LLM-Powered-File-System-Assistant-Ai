@@ -1,0 +1,21 @@
+Name: Priya Verma
+Email: priya.verma@email.com
+Phone: 9876543210
+
+Summary:
+Detail-oriented Software Engineer with strong experience in backend development and problem-solving. Passionate about building scalable applications.
+
+Skills:
+- Java
+- Spring Boot
+- MySQL
+- REST APIs
+- Git
+
+Experience:
+- Worked as a Backend Developer at XYZ Tech
+- Developed RESTful APIs for e-commerce platform
+- Improved database performance and query optimization
+
+Education:
+Bachelor of Engineering in Computer Science

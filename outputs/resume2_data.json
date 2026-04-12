@@ -1,0 +1,15 @@
+{
+  "name": "Priya Verma",
+  "skills": [
+    "Java",
+    "Spring Boot",
+    "MySQL",
+    "REST APIs",
+    "Git"
+  ],
+  "experience": [
+    "Worked as a Backend Developer at XYZ Tech",
+    "Developed RESTful APIs for e-commerce platform",
+    "Improved database performance and query optimization"
+  ]
+}
