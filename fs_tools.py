@@ -3,12 +3,20 @@ from datetime import datetime
 from PyPDF2 import PdfReader
 from docx import Document
 
-
-def fix_path(filepath):
+# ✅ ALWAYS FIX PATH HERE
+def normalize_path(filepath):
     return os.path.join("resumes", os.path.basename(filepath))
+
+
+# ---------------- READ FILE ---------------- #
 
 def read_file(filepath: str) -> dict:
     try:
+        filepath = normalize_path(filepath)
+
+        if not os.path.exists(filepath):
+            return {"success": False, "error": f"File not found: {filepath}"}
+
         ext = os.path.splitext(filepath)[1].lower()
         content = ""
 
@@ -27,7 +35,7 @@ def read_file(filepath: str) -> dict:
                 content = f.read()
 
         else:
-            return {"error": "Unsupported file type"}
+            return {"success": False, "error": "Unsupported file type"}
 
         return {
             "success": True,
@@ -42,19 +50,21 @@ def read_file(filepath: str) -> dict:
         return {"success": False, "error": str(e)}
 
 
+# ---------------- LIST FILES ---------------- #
+
 def list_files(directory: str, extension: str = None, **kwargs) -> list:
     try:
-        # 🔥 Fix incorrect directory names from LLM
-        directory = directory.lower().strip()
+        directory = "resumes"  # force fix
 
-        if "resume" in directory:
-            directory = "resumes"
+        if not os.path.exists(directory):
+            return [{"error": "resumes folder not found"}]
 
         files_data = []
 
         for file in os.listdir(directory):
-            if extension and extension.strip() and not file.endswith(extension):
-                continue
+            if extension and extension.strip():
+                if not file.lower().endswith(extension.lower()):
+                    continue
 
             path = os.path.join(directory, file)
 
@@ -62,7 +72,9 @@ def list_files(directory: str, extension: str = None, **kwargs) -> list:
                 files_data.append({
                     "name": file,
                     "size": os.path.getsize(path),
-                    "modified": datetime.fromtimestamp(os.path.getmtime(path)).isoformat()
+                    "modified": datetime.fromtimestamp(
+                        os.path.getmtime(path)
+                    ).isoformat()
                 })
 
         return files_data
@@ -71,6 +83,8 @@ def list_files(directory: str, extension: str = None, **kwargs) -> list:
         return [{"error": str(e)}]
 
 
+# ---------------- WRITE FILE ---------------- #
+
 def write_file(filepath: str, content: str) -> dict:
     try:
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -78,11 +92,13 @@ def write_file(filepath: str, content: str) -> dict:
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
 
-        return {"success": True, "message": "File written successfully"}
+        return {"success": True}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+
+# ---------------- SEARCH ---------------- #
 
 def search_in_file(filepath: str, keyword: str) -> dict:
     try:
@@ -95,19 +111,14 @@ def search_in_file(filepath: str, keyword: str) -> dict:
         keyword_lower = keyword.lower()
 
         matches = []
-        lines = content.split("\n")
-
-        for i, line in enumerate(lines):
+        for i, line in enumerate(content.split("\n")):
             if keyword_lower in line.lower():
                 matches.append({
                     "line_number": i + 1,
                     "text": line.strip()
                 })
 
-        return {
-            "success": True,
-            "matches": matches
-        }
+        return {"success": True, "matches": matches}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
